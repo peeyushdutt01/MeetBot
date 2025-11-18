@@ -1,0 +1,46 @@
+# -------------------------
+# PYTHON / GENERAL
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+.env.local
+*.env
+
+# -------------------------
+# FIREBASE & API KEYS
+# -------------------------
+firebase_key.json
+firebase_config.py
+
+# -------------------------
+# LOGS / TEMP FILES
+# -------------------------
+*.log
+tmp/
+temp/
+
+# -------------------------
+# REPORTS AND GENERATED DATA
+# -------------------------
+reports/*.json
+uploads/*
+!uploads/.gitkeep
+!reports/.gitkeep
+
+# -------------------------
+# OS FILES
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# EDITOR / IDE
+# -------------------------
+.vscode/
+.idea/

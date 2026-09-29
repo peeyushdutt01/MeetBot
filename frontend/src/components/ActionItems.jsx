@@ -45,14 +45,15 @@ const ActionItems = () => {
   return (
     <div>
       <Navbar />
-      <div className="container action-items-container">
-        <h2 className="action-items-title">Action Items</h2>
+      <main className="container action-items-container">
+        <span className="eyebrow">FOLLOW-THROUGH</span>
+        <h1 className="action-items-title">Action items</h1>
         <p className="action-items-subtitle">
           Review all action items across meetings and mark important ones for your dashboard.
         </p>
 
         {reports.length === 0 ? (
-          <p className="action-items-empty">No reports available.</p>
+          <div className="empty-state"><h3>No action items yet</h3><p>Actions from your meeting reports will appear here.</p></div>
         ) : (
           reports.map((report) => (
             <div
@@ -79,6 +80,7 @@ const ActionItems = () => {
                         <span className="action-item-text">{action}</span>
                         <input
                           type="checkbox"
+                          aria-label={`Mark important: ${action}`}
                           className="action-item-checkbox"
                           checked={checked}
                           onChange={() => toggleImportant(action, report.id)}
@@ -93,7 +95,7 @@ const ActionItems = () => {
             </div>
           ))
         )}
-      </div>
+      </main>
     </div>
   );
 };

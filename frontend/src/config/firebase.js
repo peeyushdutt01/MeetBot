@@ -10,6 +10,25 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const hasFirebaseValues = [
+  firebaseConfig.apiKey,
+  firebaseConfig.authDomain,
+  firebaseConfig.projectId,
+  firebaseConfig.appId,
+].every(value => typeof value === 'string' && value.trim().length > 0);
+
+// Keep the setup page renderable when local Firebase variables are absent or invalid.
+let app = null;
+let auth = null;
+let isFirebaseConfigured = false;
+if (hasFirebaseValues) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    isFirebaseConfigured = true;
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+  }
+}
+export { auth, isFirebaseConfigured };
 export default app;

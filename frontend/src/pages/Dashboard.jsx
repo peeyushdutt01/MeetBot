@@ -1,13 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Navbar from '../components/Navbar';
 import axios from 'axios';
 import CalendarModal from '../components/CalendarModal';
 import ActiveMeetings from '../components/ActiveMeetings';
 import ImportantActionsList from '../components/ImportantActionsList';
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from '../contexts/AuthContext';
 import API_BASE_URL from '../config/api';
-
-
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
@@ -17,390 +15,138 @@ const Dashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState('');
+  const [joinStatus, setJoinStatus] = useState('');
   const fileInputRef = useRef(null);
   const [joined, setJoined] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState('');
   const [loading, setLoading] = useState(false);
-  
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [activeMeetings, setActiveMeetings] = useState([]);
 
-  // Load upcoming meetings from backend
   const loadUpcomingMeetings = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/scheduled-meetings/filter`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: currentUser?.uid })   // or null if not signed in
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser?.uid })
       });
-      const allEvents = await response.json();
-      const now = new Date();
-      const upcoming = allEvents
-        .map(event => ({
-          ...event,
-          start: new Date(event.start),
-          end: new Date(event.end)
-        }))
-        .filter(event => event.start > now)
-        .sort((a, b) => a.start - b.start)
-        .slice(0, 3);
-      setUpcomingMeetings(upcoming);
-    } catch (error) {
-      console.error('Error fetching meetings:', error);
-      setUpcomingMeetings([]);
-    }
+      if (!response.ok) throw new Error('Could not load meetings');
+      const events = await response.json();
+      setUpcomingMeetings(events.map(event => ({ ...event, start: new Date(event.start), end: new Date(event.end) }))
+        .filter(event => event.start > new Date()).sort((a, b) => a.start - b.start).slice(0, 3));
+    } catch (error) { console.error('Error fetching meetings:', error); setUpcomingMeetings([]); }
   };
 
   const loadActiveMeetings = async () => {
-  try {
-    // 🔄 Step 1: Verify and sync local data with live Vexa bots
-    await fetch(`${API_BASE_URL}/api/verify-active-bots`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("✅ Synced with Vexa:", data);
-        if (data.stopped_count > 0) {
-          console.warn(`🛑 Cleaned up ${data.stopped_count} inactive meetings`);
-        }
-      })
-      .catch(err => console.error("⚠️ Vexa sync failed:", err));
-
-    // 📥 Step 2: Fetch the updated list of active meetings
-    const response = await fetch(`${API_BASE_URL}/api/active-meetings`);
-    if (!response.ok) {
-      throw new Error(`Server responded with ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log("📊 Active meetings after sync:", data);
-    setActiveMeetings(data);
-  } catch (error) {
-    console.error('❌ Error fetching active meetings:', error);
-  }
-};
-
+    try {
+      await fetch(`${API_BASE_URL}/api/verify-active-bots`).catch(() => {});
+      const response = await fetch(`${API_BASE_URL}/api/active-meetings`);
+      if (!response.ok) throw new Error('Could not load active meetings');
+      setActiveMeetings(await response.json());
+    } catch (error) { console.error('Error fetching active meetings:', error); }
+  };
 
   useEffect(() => {
     loadUpcomingMeetings();
     loadActiveMeetings();
     const upcomingInterval = setInterval(loadUpcomingMeetings, 60000);
     const activeInterval = setInterval(loadActiveMeetings, 10000);
-    return () => {
-      clearInterval(upcomingInterval);
-      clearInterval(activeInterval);
-    };
-  }, []);
+    return () => { clearInterval(upcomingInterval); clearInterval(activeInterval); };
+  }, [currentUser?.uid]);
 
-  const handleCalendarClose = () => {
-    setIsCalendarOpen(false);
-    loadUpcomingMeetings();
-  };
-
-  const formatMeetingTime = (date) => {
-    const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return date.toLocaleString('en-US', options);
-  };
-
-  const getTimeUntil = (date) => {
-    const now = new Date();
-    const diff = date - now;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    if (days > 0) return `in ${days} day${days > 1 ? 's' : ''}`;
-    if (hours > 0) return `in ${hours} hour${hours > 1 ? 's' : ''}`;
-    if (minutes > 0) return `in ${minutes} min${minutes > 1 ? 's' : ''}`;
-    return 'soon';
-  };
-
-  const handleSchedule = () => setIsCalendarOpen(true);
-  const handleJoinClick = () => setShowUrlInput(true);
-  
   const handleConfirmJoin = async () => {
-    if (!meetingUrl.trim()) return alert("Please enter a meeting URL.");
-
+    if (!meetingUrl.trim()) return;
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/join-meeting`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ meeting_link: meetingUrl, uid: currentUser?.uid, createdBy: currentUser?.email }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meeting_link: meetingUrl, uid: currentUser?.uid, createdBy: currentUser?.email })
       });
-
       const data = await response.json();
-
-      if (response.ok && data.success) {
-        alert(`✅ MeetBot invited successfully for ${meetingUrl}`);
-        console.log("Vexa Bot Response:", data);
-
-        // ✅ Add the joined meeting to the active meetings state (so it appears in the list)
-        setActiveMeetings((prev) => [
-          ...prev,
-          {
-            id: data.meeting_id, // keep consistent naming
-            meeting_id: data.meeting_id,
-            bot_id: data.bot_id,
-            native_meeting_id: data.native_meeting_id,
-            link: meetingUrl,
-            status: data.status || "in_progress",
-            joined_at: data.joined_at,
-            title: "Direct Joined Meeting",
-          },
-        ]);
-
-        setJoined(true);
-      } else {
-        alert(`❌ Failed: ${data.error || "Unknown error"}`);
-      }
-    } catch (err) {
-      console.error("Join error:", err);
-      alert("Error connecting to backend.");
-    }
+      if (!response.ok || !data.success) throw new Error(data.error || 'Could not join meeting');
+      setActiveMeetings(prev => [...prev, {
+        id: data.meeting_id, meeting_id: data.meeting_id, bot_id: data.bot_id,
+        native_meeting_id: data.native_meeting_id, link: meetingUrl,
+        status: data.status || 'in_progress', joined_at: data.joined_at, title: 'Direct joined meeting'
+      }]);
+      setJoined(true);
+      setJoinStatus('MeetBot has been invited to your meeting.');
+    } catch (error) { setJoinStatus(error.message); } finally { setLoading(false); }
   };
 
   const handleGetTranscript = async () => {
-  setLoading(true);
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/get-transcript`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        meeting_link: meetingUrl,
-        uid: currentUser?.uid,          // ✅ REQUIRED
-        createdBy: currentUser?.email    // ✅ REQUIRED
-      }),
-    });
-
-    const data = await response.json();
-
-    if (data.success && data.transcript) {
-      setTranscript(data.transcript);
-    } else {
-      alert(data.message || "Transcript not ready yet.");
-    }
-
-  } catch (err) {
-    console.error(err);
-    alert("Error fetching transcript.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setUploadStatus('');
-    }
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/get-transcript`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meeting_link: meetingUrl, uid: currentUser?.uid, createdBy: currentUser?.email })
+      });
+      const data = await response.json();
+      if (data.success && data.transcript) setTranscript(data.transcript);
+      else setJoinStatus(data.message || 'Transcript is not ready yet.');
+    } catch (error) { setJoinStatus('Could not fetch transcript. Please try again.'); }
+    finally { setLoading(false); }
   };
-
-  const handleChooseFile = () => fileInputRef.current?.click();
 
   const handleUpload = async () => {
-    if (!file) return alert('Please select a file first');
+    if (!file) return;
     const formData = new FormData();
     formData.append('file', file);
-
     try {
-      setUploading(true);
-      setUploadStatus('Uploading...');
-      const response = await axios.post(`${API_BASE_URL}/api/process-meeting`, formData, {
+      setUploading(true); setUploadStatus('Uploading recording…');
+      await axios.post(`${API_BASE_URL}/api/process-meeting`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (p) => setUploadProgress(Math.round((p.loaded * 100) / p.total)),
+        onUploadProgress: (p) => setUploadProgress(Math.round((p.loaded * 100) / (p.total || p.loaded)))
       });
-
-      setUploadStatus('Processing complete!');
-      alert('Meeting processed successfully!');
-      console.log('Result:', response.data);
-      setFile(null);
-      setUploadProgress(0);
-    } catch (error) {
-      console.error('Upload error:', error);
-      setUploadStatus('Upload failed. Please try again.');
-    } finally {
-      setUploading(false);
-    }
+      setUploadStatus('Recording processed. Your report is ready.');
+      setFile(null); setUploadProgress(0);
+    } catch (error) { console.error('Upload error:', error); setUploadStatus('Upload failed. Please try again.'); }
+    finally { setUploading(false); }
   };
 
-  return (
-    <div>
-      <Navbar />
-      <div className="container">
-        <div className="nata-sans hero">
-          <h1>Automate, Analyze & Summarize Meetings with MeetBot</h1>
-          <p>Your AI meeting ally – joins, transcribes, summarizes, and tracks decisions so you don't have to.</p>
+  return <div className="app-shell">
+    <Navbar />
+    <main className="dashboard-page">
+      <section className="dashboard-intro">
+        <div><span className="eyebrow">MEETING WORKSPACE</span><h1>Meetings, handled.</h1><p>Bring MeetBot into a call, plan what is next, and keep every follow-up in one place.</p></div>
+        <button className="btn-primary" onClick={() => setIsCalendarOpen(true)}>+ Schedule meeting</button>
+      </section>
 
-          <div className="actions">
-            <button className="btn-primary" onClick={handleSchedule}>Schedule a Meeting</button>
-            <button className="btn-secondary" onClick={handleJoinClick}>Join a Meeting</button>
-          </div>
-
-          {showUrlInput && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
-              <input
-                type="text"
-                placeholder="Enter meeting URL"
-                value={meetingUrl}
-                onChange={(e) => setMeetingUrl(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '2px solid #a087fa',
-                  background: '#21232d',
-                  color: '#fff',
-                  fontSize: '1rem'
-                }}
-              />
-              {!joined ? (
-                <button className="btn-primary" onClick={handleConfirmJoin} disabled={loading}>
-                  {loading ? "Joining..." : "Join"}
-                </button>
-              ) : (
-                <button className="btn-secondary" onClick={handleGetTranscript} disabled={loading}>
-                  {loading ? "Fetching..." : "Get Transcript"}
-                </button>
-              )}
+      <div className="dashboard-grid">
+        <div className="dashboard-main">
+          <section className="surface-panel quick-start">
+            <div className="section-heading"><div><span className="eyebrow">GET STARTED</span><h2>What would you like to do?</h2></div></div>
+            <div className="quick-actions">
+              <button className="quick-action" onClick={() => setIsCalendarOpen(true)}><span className="quick-action-icon">01</span><strong>Schedule a meeting</strong><span>Add a time and meeting link to your calendar.</span><span className="quick-arrow">↗</span></button>
+              <button className="quick-action" onClick={() => setShowUrlInput(value => !value)}><span className="quick-action-icon">02</span><strong>Join a meeting</strong><span>Invite MeetBot to a call already in progress.</span><span className="quick-arrow">↗</span></button>
             </div>
-          )}
+            {showUrlInput && <div className="join-panel"><label htmlFor="meeting-url">Meeting link</label><div className="join-row"><input id="meeting-url" type="url" placeholder="Paste a Google Meet or Zoom link" value={meetingUrl} onChange={e => setMeetingUrl(e.target.value)} /><button className="btn-primary" onClick={joined ? handleGetTranscript : handleConfirmJoin} disabled={loading || !meetingUrl.trim()}>{loading ? 'Working…' : joined ? 'Get transcript' : 'Invite MeetBot'}</button></div></div>}
+            {joinStatus && <p className="status-note" role="status">{joinStatus}</p>}
+            {transcript && <div className="transcript-panel"><h3>Live transcript</h3><pre>{transcript}</pre></div>}
+          </section>
 
-          {transcript && (
-            <div style={{ marginTop: '20px', width: '100%' }}>
-              <h3 style={{ color: '#a087fa' }}>📝 Live Transcript</h3>
-              <pre style={{
-                background: '#1f1f2b',
-                color: '#e3e1f7',
-                padding: '15px',
-                borderRadius: '10px',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                maxHeight: '400px',
-                overflowY: 'auto',
-                fontFamily: 'monospace',
-                fontSize: '0.9rem'
-              }}>
-                {transcript}
-              </pre>
-            </div>
-          )}
+          <section className="surface-panel upload-section">
+            <div className="section-heading"><div><span className="eyebrow">FROM A RECORDING</span><h2>Process a past meeting</h2><p>Upload audio to get a summary, decisions, and action items.</p></div></div>
+            <input ref={fileInputRef} type="file" accept=".mp3,.wav,.m4a,.webm" onChange={e => { setFile(e.target.files[0] || null); setUploadStatus(''); }} hidden />
+            <div className="upload-box"><div><strong>{file ? file.name : 'Choose an audio file'}</strong><span>{file ? `${(file.size / 1048576).toFixed(2)} MB` : 'MP3, WAV, M4A or WebM · up to 25 MB'}</span></div><button className="btn-secondary" onClick={() => fileInputRef.current?.click()}>{file ? 'Change file' : 'Browse files'}</button></div>
+            {file && <div className="upload-footer"><button className="btn-primary" onClick={handleUpload} disabled={uploading}>{uploading ? 'Processing…' : 'Upload and process'}</button><button className="text-button" onClick={() => { setFile(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}>Remove</button></div>}
+            {uploading && <div className="progress-bar" role="progressbar" aria-valuenow={uploadProgress} aria-valuemin="0" aria-valuemax="100"><div className="progress-fill" style={{ width: `${uploadProgress}%` }} /></div>}
+            {uploadStatus && <p className="status-note" role="status">{uploadStatus}</p>}
+          </section>
 
-          <div className="upload-section" style={{ marginTop: '40px' }}>
-            <h3>Upload Meeting Recording</h3>
-            <span className='little-text'>(mp3 / wav / m4a / webm)</span>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".mp3,.wav,.m4a,.webm"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            
-            <div style={{ marginTop: '20px' }}>
-              <button className="btn-secondary" onClick={handleChooseFile} style={{ marginBottom: '15px' }}>
-                <h3>📁 Choose File</h3> <span className='little-text'> less than 25mb in size</span>
-              </button>
-              {file && (
-                <div style={{
-                  padding: '12px', background: '#2a2c3e', borderRadius: '8px',
-                  display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>📄</span>
-                    <span style={{ color: '#a087fa', fontWeight: '600' }}>{file.name}</span>
-                    <span style={{ color: '#888', fontSize: '0.9rem' }}>
-                      ({(file.size / (1024 * 1024)).toFixed(2)} MB)
-                    </span>
-                  </div>
-                  <button onClick={() => setFile(null)} style={{
-                    background: 'transparent', border: 'none', color: '#ff6b6b', cursor: 'pointer'
-                  }}>✕</button>
-                </div>
-              )}
-            </div>
-            
-            {file && (
-              <div style={{ marginTop: '20px', marginBottom: '10px' }}>
-                <button className="btn-primary" onClick={handleUpload} disabled={uploading} style={{ width: '100%' }}>
-                  {uploading ? '⏳ Processing...' : '🚀 Upload & Process'}
-                </button>
-              </div>
-            )}
-            {uploading && (
-              <div className="progress-bar" style={{ marginTop: '20px' }}>
-                <div className="progress-fill" style={{ width: `${uploadProgress}%` }}></div>
-                <span style={{
-                  position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-                  color: '#fff', fontWeight: '600', fontSize: '0.85rem'
-                }}>{uploadProgress}%</span>
-              </div>
-            )}
-            {uploadStatus && (
-              <p id="uploadStatus" style={{
-                marginTop: '10px', color: uploadStatus.includes('failed') ? '#ff6b6b' : '#a087fa',
-                fontWeight: '600', textAlign: 'center'
-              }}>{uploadStatus}</p>
-            )}
-          </div>
-
-          {/* Important Action Items Section */}
-          <div className="action-items-section" style={{ marginTop: "30px" }}>
-            <h2 style={{ color: "#a087fa", marginBottom: "15px" }}>Important Action Items</h2>
-            <ImportantActionsList />
-          </div>
+          <section className="surface-panel action-items-section"><div className="section-heading"><div><span className="eyebrow">FOLLOW-THROUGH</span><h2>Important actions</h2></div><a className="text-link" href="/actions">View all →</a></div><ImportantActionsList /></section>
         </div>
-
-        <div className="sidebar">
-          <div className="card">
-            <h3>Upcoming Meetings ({upcomingMeetings.length})</h3>
-            {upcomingMeetings.length > 0 ? (
-              <ul style={{ listStyle: 'none', padding: 0 }}>
-                {upcomingMeetings.map((meeting) => (
-                  <li key={meeting.id} style={{ 
-                    borderBottom: '1px solid #2e2e3c',
-                    paddingBottom: '12px',
-                    marginBottom: '12px'
-                  }}>
-                    <div style={{ fontWeight: '600', color: '#e3e1f7', marginBottom: '4px', fontSize: '0.95rem' }}>
-                      {meeting.title}
-                    </div>
-                    <div style={{ fontSize: '0.85rem', color: '#a087fa', marginBottom: '2px' }}>
-                      {formatMeetingTime(meeting.start)}
-                    </div>
-                    <div style={{ fontSize: '0.8rem', color: '#aa9de8' }}>
-                      {getTimeUntil(meeting.start)}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p style={{ color: '#bbb7d1', fontSize: '0.9rem', marginTop: '10px' }}>
-                No upcoming meetings scheduled. Click "Schedule a Meeting" to add one.
-              </p>
-            )}
-            <button 
-              className="btn-secondary" 
-              onClick={() => setIsCalendarOpen(true)}
-              style={{ marginTop: '16px', width: '100%' }}
-            >
-              View Calendar
-            </button>
-          </div>
-
-          {/* Active Meetings Component */}
+        <aside className="dashboard-sidebar">
+          <section className="surface-panel upcoming-panel"><div className="section-heading"><div><span className="eyebrow">AHEAD OF YOU</span><h2>Upcoming meetings</h2></div><span className="count-badge">{upcomingMeetings.length}</span></div>
+            {upcomingMeetings.length ? <ul className="upcoming-list">{upcomingMeetings.map(meeting => <li key={meeting.id}><span className="meeting-date-box"><strong>{meeting.start.toLocaleDateString(undefined, { day: '2-digit' })}</strong><small>{meeting.start.toLocaleDateString(undefined, { month: 'short' })}</small></span><span className="upcoming-detail"><strong>{meeting.title}</strong><small>{meeting.start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}</small></span></li>)}</ul> : <p className="empty-note">Your schedule is clear. Add a meeting to get started.</p>}
+            <button className="btn-secondary full-width" onClick={() => setIsCalendarOpen(true)}>Open calendar</button>
+          </section>
           <ActiveMeetings activeMeetings={activeMeetings} onRefresh={loadActiveMeetings} />
-        </div>
+        </aside>
       </div>
-
-      <CalendarModal 
-      isOpen={isCalendarOpen} 
-      onClose={handleCalendarClose} 
-      userEmail={currentUser?.email} 
-      userUid={currentUser?.uid} />
-
-    </div>
-  );
+    </main>
+    <CalendarModal isOpen={isCalendarOpen} onClose={() => { setIsCalendarOpen(false); loadUpcomingMeetings(); }} userEmail={currentUser?.email} userUid={currentUser?.uid} />
+  </div>;
 };
 
 export default Dashboard;

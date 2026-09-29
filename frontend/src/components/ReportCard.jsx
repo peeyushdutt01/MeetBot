@@ -22,7 +22,7 @@ const ReportCard = ({ report, onDelete }) => {
 
   return (
     <div className="report-card">
-      <div className="report-header-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="report-header-row">
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <h3 className="report-title">{report.title || report.filename}</h3>
           <span className="report-date" style={{ marginTop: '8px', fontSize: '0.9rem', color: '#888' }}>
@@ -33,25 +33,7 @@ const ReportCard = ({ report, onDelete }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             onClick={handleDelete}
-            style={{
-              background: 'transparent',
-              border: '1px solid #ff6b6b',
-              color: '#ff6b6b',
-              padding: '6px 14px',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: '600',
-              transition: 'all 0.3s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = '#ff6b6b';
-              e.target.style.color = '#fff';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = 'transparent';
-              e.target.style.color = '#ff6b6b';
-            }}
+            className="report-delete"
             title="Delete report"
           >
             Delete
@@ -100,7 +82,6 @@ const ReportCard = ({ report, onDelete }) => {
             <ul className="participant-list">
               {report.participants.map((participant, idx) => (
                 <li key={idx}>
-                  <span style={{ fontSize: '1.2rem', marginRight: '8px' }}>👤</span>
                   {participant}
                 </li>
               ))}
@@ -117,7 +98,6 @@ const ReportCard = ({ report, onDelete }) => {
               <ul className="participant-list">
                 {report.key_dates.map((date, idx) => (
                   <li key={idx}>
-                    <span style={{ fontSize: '1.2rem', marginRight: '8px' }}>📅</span>
                     {date}
                   </li>
                 ))}

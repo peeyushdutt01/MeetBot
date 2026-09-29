@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/auth.css';
+import AuthShell from '../components/AuthShell';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -28,20 +29,17 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="logo-container">
-          <img src="logo.png" alt="MeetBot Logo" className="logo" />
-        </div>
-        <h2>Welcome Back</h2>
-        <p className="auth-subtitle">Log in to continue</p>
+    <AuthShell>
+        <h2>Welcome back</h2>
+        <p className="auth-subtitle">Sign in to your meeting workspace.</p>
         
         {error && <div className="error-message">{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label htmlFor="login-email">Email</label>
             <input
+              id="login-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -51,8 +49,9 @@ const Login = () => {
           </div>
           
           <div className="form-group">
-            <label>Password</label>
+            <label htmlFor="login-password">Password</label>
             <input
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -69,8 +68,7 @@ const Login = () => {
         <p className="auth-footer">
           Don't have an account? <Link to="/signup">Sign up</Link>
         </p>
-      </div>
-    </div>
+    </AuthShell>
   );
 };
 

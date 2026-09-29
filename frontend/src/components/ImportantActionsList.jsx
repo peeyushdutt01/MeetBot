@@ -1,108 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../contexts/AuthContext";
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import API_BASE_URL from '../config/api';
+
+const readItems = (key) => {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+  catch { return []; }
+};
 
 const ImportantActionsList = () => {
   const { currentUser } = useAuth();
   const [reports, setReports] = useState([]);
-  const [importantActions, setImportantActions] = useState(
-    JSON.parse(localStorage.getItem("importantActions") || "[]")
-  );
-  const [doneItems, setDoneItems] = useState(
-    JSON.parse(localStorage.getItem("doneActions") || "[]")
-  );
-
+  const [importantActions, setImportantActions] = useState(() => readItems('importantActions'));
+  const [doneItems, setDoneItems] = useState(() => readItems('doneActions'));
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/reports/filter`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ uid: currentUser?.uid })
-        });
-        const data = await res.json();
-        setReports(data);
-      } catch (err) {
-        console.error("Error fetching reports:", err);
-      }
+        const response = await fetch(`${API_BASE_URL}/api/reports/filter`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uid: currentUser?.uid }) });
+        setReports(await response.json());
+      } catch (err) { console.error('Error fetching reports:', err); }
     };
     fetchReports();
   }, [currentUser?.uid]);
-
-  const allActions = reports
-    .flatMap((r) => (r.action_items || []).map((a) => ({
-      id: `${r.id}-${a}`,
-      meeting: r.title || "Untitled Meeting",
-      date: r.date,
-      action: a,
-    })))
-    .filter((item) => importantActions.includes(item.id));
-
+  const allActions = reports.flatMap(report => (report.action_items || []).map(action => ({
+    id: `${report.id}-${action}`, meeting: report.title || 'Untitled meeting', date: report.date, action
+  }))).filter(item => importantActions.includes(item.id));
   const toggleDone = (id) => {
-    const updated = doneItems.includes(id)
-      ? doneItems.filter((x) => x !== id)
-      : [...doneItems, id];
-    setDoneItems(updated);
-    localStorage.setItem("doneActions", JSON.stringify(updated));
+    const updated = doneItems.includes(id) ? doneItems.filter(item => item !== id) : [...doneItems, id];
+    setDoneItems(updated); localStorage.setItem('doneActions', JSON.stringify(updated));
   };
-
   const removeAction = (id) => {
-    const updated = importantActions.filter((x) => x !== id);
-    setImportantActions(updated);
-    localStorage.setItem("importantActions", JSON.stringify(updated));
+    const updated = importantActions.filter(item => item !== id);
+    setImportantActions(updated); localStorage.setItem('importantActions', JSON.stringify(updated));
   };
-
-  if (allActions.length === 0) {
-    return <p style={{ color: "#aaa" }}>No important action items selected.</p>;
-  }
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      {allActions.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            background: "#1f1f2b",
-            padding: "15px",
-            borderRadius: "10px",
-            border: "1px solid #2e2e3c",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            opacity: doneItems.includes(item.id) ? 0.6 : 1,
-          }}
-        >
-          <div>
-            <strong style={{ color: "#e3e1f7" }}>{item.action}</strong>
-            <p style={{ color: "#888", fontSize: "0.85rem" }}>
-              {item.meeting} — {new Date(item.date).toLocaleDateString()}
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <input
-              type="checkbox"
-              checked={doneItems.includes(item.id)}
-              onChange={() => toggleDone(item.id)}
-              title="Mark as done"
-            />
-            <button
-              onClick={() => removeAction(item.id)}
-              style={{
-                background: "transparent",
-                border: "none",
-                color: "#ff6b6b",
-                cursor: "pointer",
-                fontSize: "1rem",
-              }}
-              title="Remove action"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  if (!allActions.length) return <p className="empty-note">No important actions selected. Mark actions on the Actions page to pin them here.</p>;
+  return <div>{allActions.map(item => <div key={item.id} className={`important-action ${doneItems.includes(item.id) ? 'done' : ''}`}>
+    <div><strong>{item.action}</strong><p>{item.meeting} · {new Date(item.date).toLocaleDateString()}</p></div>
+    <div className="important-action-controls"><input type="checkbox" checked={doneItems.includes(item.id)} onChange={() => toggleDone(item.id)} aria-label={`Mark complete: ${item.action}`} /><button onClick={() => removeAction(item.id)} aria-label={`Remove: ${item.action}`}>×</button></div>
+  </div>)}</div>;
 };
-
 export default ImportantActionsList;

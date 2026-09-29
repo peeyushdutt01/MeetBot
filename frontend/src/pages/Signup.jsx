@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/auth.css';
+import AuthShell from '../components/AuthShell';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -34,20 +35,17 @@ const Signup = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="logo-container">
-          <img src="logo.png" alt="MeetBot Logo" className="logo" />
-        </div>
-        <h2>Create Account</h2>
-        <p className="auth-subtitle">Sign up to get started</p>
+    <AuthShell>
+        <h2>Create your account</h2>
+        <p className="auth-subtitle">Keep every meeting and follow-up in one place.</p>
 
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email</label>
+            <label htmlFor="signup-email">Email</label>
             <input
+              id="signup-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -57,8 +55,9 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label>Password</label>
+            <label htmlFor="signup-password">Password</label>
             <input
+              id="signup-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -68,8 +67,9 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label>Confirm Password</label>
+            <label htmlFor="signup-confirm">Confirm password</label>
             <input
+              id="signup-confirm"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -86,8 +86,7 @@ const Signup = () => {
         <p className="auth-footer">
           Already have an account? <Link to="/login">Log in</Link>
         </p>
-      </div>
-    </div>
+    </AuthShell>
   );
 };
 

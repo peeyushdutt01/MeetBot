@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import CalendarModal from './CalendarModal';
 import SettingsModal from './SettingsModal';
@@ -32,7 +32,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar">
-        <img src="logo.png" alt="MeetBot Logo" className="navbar-logo" />
+        <Link to="/" className="brand" aria-label="MeetBot home"><span className="brand-mark">M</span><span>meetbot<span className="brand-dot">.</span></span></Link>
 
         <button 
           className="mobile-menu-toggle" 
@@ -45,27 +45,11 @@ const Navbar = () => {
         </button>
 
         <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-          <a
-            onClick={() => handleNavClick(() => navigate('/'))}
-            className={isActive('/') ? 'active' : ''}
-          >
-            Home
-          </a>
-          <a
-            onClick={() => handleNavClick(() => setShowCalendar(true))}
-          >
-            Calendar
-          </a>
-          <a onClick={() => handleNavClick(() => navigate('/reports'))}>
-            Reports
-          </a>
-          <a onClick={() => handleNavClick(() => navigate('/actions'))}>
-            Actions
-          </a>
-
-          <a onClick={() => handleNavClick(() => setShowSettings(true))}>
-            Settings
-          </a>
+          <Link to="/" onClick={() => setMobileMenuOpen(false)} className={isActive('/') ? 'active' : ''}>Overview</Link>
+          <button type="button" onClick={() => handleNavClick(() => setShowCalendar(true))}>Calendar</button>
+          <Link to="/reports" onClick={() => setMobileMenuOpen(false)} className={isActive('/reports') ? 'active' : ''}>Reports</Link>
+          <Link to="/actions" onClick={() => setMobileMenuOpen(false)} className={isActive('/actions') ? 'active' : ''}>Actions</Link>
+          <button type="button" onClick={() => handleNavClick(() => setShowSettings(true))}>Settings</button>
           
           <button className="signup-btn mobile-logout" onClick={() => handleNavClick(handleLogout)}>
             Sign Out

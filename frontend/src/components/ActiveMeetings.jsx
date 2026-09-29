@@ -118,24 +118,6 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
     });
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'in_progress': return { bg: '#1a472a', border: '#22c55e', text: '#4ade80' };
-      case 'bot_joining': return { bg: '#1e3a5f', border: '#3b82f6', text: '#60a5fa' };
-      case 'processing': return { bg: '#4a3a1a', border: '#f59e0b', text: '#fbbf24' };
-      default: return { bg: '#2e2e3c', border: '#666', text: '#aaa' };
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'in_progress': return '🟢';
-      case 'bot_joining': return '🔵';
-      case 'processing': return '⏳';
-      default: return '⚪';
-    }
-  };
-
   const getStatusText = (status) => {
     switch (status) {
       case 'in_progress': return 'Active';
@@ -148,7 +130,7 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
   return (
     <div className="card">
       <div className="active-meetings-header">
-        <h3 style={{ margin: 0 }}>🤖 Active Meetings</h3>
+        <h3 style={{ margin: 0 }}>Active meetings</h3>
         {activeMeetings.length > 0 && (
           <span className="active-meetings-badge">
             {activeMeetings.length} active
@@ -171,7 +153,6 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
             const isStopping = stoppingBot[meetingId];
             const canFetch = status === 'in_progress' && meetingId;  // Only allow if ID exists
             const canStop = (status === 'in_progress' || status === 'bot_joining') && meetingId;  // Only allow if ID exists
-            const colors = getStatusColor(status);
 
             return (
               <div
@@ -184,14 +165,9 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
                   </div>
                   
                   <div 
-                    className="active-meeting-status"
-                    style={{
-                      background: colors.bg,
-                      border: `1px solid ${colors.border}`,
-                      color: colors.text
-                    }}
+                    className={`active-meeting-status status-${status}`}
                   >
-                    <span>{getStatusIcon(status)}</span>
+                    <span className="status-dot" />
                     <span>{getStatusText(status)}</span>
                   </div>
                 </div>
@@ -212,7 +188,7 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
                     rel="noopener noreferrer"
                     className="active-meeting-link"
                   >
-                    🔗 Join Meeting
+                    Join meeting ↗
                   </a>
                 )}
 
@@ -230,12 +206,10 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
                     >
                       {isFetching ? (
                         <>
-                          <span style={{ marginRight: '6px' }}>⏳</span>
                           Fetching...
                         </>
                       ) : (
                         <>
-                          <span style={{ marginRight: '6px' }}>📥</span>
                           Get Transcript
                         </>
                       )}
@@ -251,12 +225,10 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
                     >
                       {isStopping ? (
                         <>
-                          <span style={{ marginRight: '4px' }}>⏳</span>
                           Stopping...
                         </>
                       ) : (
                         <>
-                          <span style={{ marginRight: '4px' }}>🛑</span>
                           Stop Bot
                         </>
                       )}
@@ -300,7 +272,6 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
         </div>
       ) : (
         <div className="active-meeting-empty">
-          <div className="active-meeting-empty-icon">💤</div>
           <p className="active-meeting-empty-text">
             No active meetings
           </p>
@@ -312,7 +283,7 @@ const ActiveMeetings = ({ activeMeetings, onRefresh }) => {
 
       <div className="active-meeting-tip">
         <div className="active-meeting-tip-title">
-          💡 Quick Tip
+          Good to know
         </div>
         <div>
           Click "Get Transcript" anytime during the meeting, or "Stop Bot" to end recording early.

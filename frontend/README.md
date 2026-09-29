@@ -77,6 +77,11 @@ Preview production build:
 npm run preview
 ```
 
+The public landing page is authored in `index.html`, with its styles in
+`src/styles/landing.css` and interactions in `src/landing.js`. It is served at
+`/`. Sign-in remains at `/login`, and the authenticated dashboard is at
+`/app`. The React workspace loads only on application routes.
+
 ## Environment Variables
 
 Create a `.env` file in the frontend directory (optional):

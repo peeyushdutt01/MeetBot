@@ -32,7 +32,7 @@ const Navbar = () => {
   return (
     <>
       <nav className="navbar">
-        <Link to="/" className="brand" aria-label="MeetBot home"><span className="brand-mark">M</span><span>meetbot<span className="brand-dot">.</span></span></Link>
+        <a href="/" className="brand" aria-label="MeetBot home"><span className="brand-mark">M</span><span>meetbot<span className="brand-dot">.</span></span></a>
 
         <button 
           className="mobile-menu-toggle" 
@@ -45,7 +45,7 @@ const Navbar = () => {
         </button>
 
         <div className={`nav-links ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-          <Link to="/" onClick={() => setMobileMenuOpen(false)} className={isActive('/') ? 'active' : ''}>Overview</Link>
+          <Link to="/app" onClick={() => setMobileMenuOpen(false)} className={isActive('/app') ? 'active' : ''}>Overview</Link>
           <button type="button" onClick={() => handleNavClick(() => setShowCalendar(true))}>Calendar</button>
           <Link to="/reports" onClick={() => setMobileMenuOpen(false)} className={isActive('/reports') ? 'active' : ''}>Reports</Link>
           <Link to="/actions" onClick={() => setMobileMenuOpen(false)} className={isActive('/actions') ? 'active' : ''}>Actions</Link>

@@ -19,7 +19,7 @@ const Login = () => {
       setError('');
       setLoading(true);
       await login(email, password);
-      navigate('/');
+      navigate('/app');
     } catch (error) {
       setError('Failed to log in. Please check your credentials.');
       console.error('Login error:', error);

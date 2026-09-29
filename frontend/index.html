@@ -1,19 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f3ed" />
+    <meta name="description" content="MeetBot turns meetings into clear notes, decisions, and next steps. Stay present in the conversation and leave with a plan." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/styles/landing.css" />
+    <script>document.documentElement.dataset.view = location.pathname === '/' ? 'landing' : 'app';</script>
+    <title>MeetBot — Leave every meeting with clarity</title>
+  </head>
+  <body>
+    <div id="landing">
+      <a class="lp-skip" href="#main">Skip to content</a>
+      <header class="lp-header">
+        <div class="lp-wrap lp-header-inner">
+          <a class="lp-brand" href="/" aria-label="MeetBot home"><span class="lp-brand-mark">M</span><span>meetbot<span class="lp-brand-period">.</span></span></a>
+          <nav class="lp-nav" id="landing-nav" aria-label="Main navigation">
+            <a href="#why">Why MeetBot</a>
+            <a href="#workflow">How it works</a>
+            <a href="#features">Features</a>
+            <a href="#questions">FAQs</a>
+          </nav>
+          <div class="lp-header-actions">
+            <a class="lp-login" href="/login">Log in</a>
+            <a class="lp-button lp-button-dark lp-header-cta" href="/signup">Get started <span aria-hidden="true">↗</span></a>
+          </div>
+          <button class="lp-menu-toggle" type="button" aria-expanded="false" aria-controls="landing-nav" aria-label="Open menu"><span></span><span></span></button>
+        </div>
+      </header>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <main id="main">
+        <section class="lp-hero">
+          <div class="lp-wrap">
+            <div class="lp-hero-copy">
+              <span class="lp-kicker"><span class="lp-kicker-line"></span> THE MEETING WORKSPACE</span>
+              <h1>Be in the meeting.<br /><em>Keep what matters.</em></h1>
+              <p>MeetBot captures the conversation, finds the decisions, and puts your next steps in one clear place. So you can give the room your full attention.</p>
+              <div class="lp-hero-actions">
+                <a class="lp-button lp-button-dark" href="/signup">Start with MeetBot <span aria-hidden="true">↗</span></a>
+                <a class="lp-text-link" href="#workflow">See how it works <span aria-hidden="true">↓</span></a>
+              </div>
+              <span class="lp-hero-footnote">From the first hello to the final follow-up.</span>
+            </div>
+            <div class="lp-scene" aria-label="Illustration of a meeting becoming notes and action items">
+              <div class="lp-scene-orbit lp-scene-orbit-one"></div>
+              <div class="lp-scene-orbit lp-scene-orbit-two"></div>
+              <div class="lp-scene-window">
+                <div class="lp-window-top"><div class="lp-window-dots"><i></i><i></i><i></i></div><span>Tuesday team sync</span><span class="lp-live"><i></i> Live</span></div>
+                <div class="lp-window-body">
+                  <div class="lp-speaker"><span class="lp-avatar">A</span><div><strong>Alex</strong><p>Let's launch the new onboarding flow next week.</p></div></div>
+                  <div class="lp-speaker"><span class="lp-avatar lp-avatar-two">J</span><div><strong>Jordan</strong><p>I'll prepare the final checklist by Thursday.</p></div></div>
+                  <div class="lp-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                </div>
+              </div>
+              <div class="lp-float-card lp-summary-card">
+                <span class="lp-card-tag">THE TAKEAWAY</span>
+                <strong>Onboarding launch<br />approved for next week.</strong>
+                <span class="lp-card-rule"></span>
+                <small>Decision captured automatically</small>
+              </div>
+              <div class="lp-float-card lp-action-card"><span class="lp-action-check">✓</span><div><span class="lp-card-tag">NEXT STEP</span><strong>Final checklist</strong><small>Jordan · Thursday</small></div></div>
+              <div class="lp-scene-label">CONVERSATION → CLARITY</div>
+            </div>
+          </div>
+        </section>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MeetBot — Meeting workspace</title>
-</head>
+        <div class="lp-marquee" aria-label="MeetBot helps with transcripts, summaries, decisions, and next steps"><div class="lp-marquee-track" aria-hidden="true">
+          <span>Every word, when you need it</span><b>✳</b><span>Decisions you can find</span><b>✳</b><span>Next steps that stay visible</span><b>✳</b>
+          <span>Every word, when you need it</span><b>✳</b><span>Decisions you can find</span><b>✳</b><span>Next steps that stay visible</span><b>✳</b>
+        </div></div>
 
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
+        <section class="lp-intro lp-section" id="why">
+          <div class="lp-wrap lp-intro-grid">
+            <span class="lp-section-index lp-reveal">01 / WHY IT MATTERS</span>
+            <div class="lp-reveal"><h2>Good meetings move things forward.<br /><em>Great follow-up makes it stick.</em></h2><p>Notes are easy to lose. Decisions get buried. The next step is often the first thing forgotten. MeetBot gives every conversation a useful second life.</p></div>
+          </div>
+        </section>
 
+        <section class="lp-workflow lp-section" id="workflow">
+          <div class="lp-wrap">
+            <div class="lp-section-head lp-reveal"><div><span class="lp-section-index">02 / HOW IT WORKS</span><h2>One conversation.<br />A clearer way forward.</h2></div><p>From live calls to uploaded recordings, MeetBot helps you move from talking to doing.</p></div>
+            <div class="lp-steps">
+              <article class="lp-step lp-reveal"><div class="lp-step-top"><span>01</span><span class="lp-step-arrow">↗</span></div><div class="lp-step-art lp-step-art-call"><span class="lp-mini-live"><i></i> In meeting</span><div class="lp-mini-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><h3>Bring MeetBot in</h3><p>Schedule a call, invite the bot to an active meeting, or upload a recording afterward.</p></article>
+              <article class="lp-step lp-reveal"><div class="lp-step-top"><span>02</span><span class="lp-step-arrow">↗</span></div><div class="lp-step-art lp-step-art-notes"><span>MEETING NOTES</span><i></i><i></i><i></i><i></i></div><h3>Find the signal</h3><p>Get a transcript and a focused summary of topics, decisions, dates, and people.</p></article>
+              <article class="lp-step lp-reveal"><div class="lp-step-top"><span>03</span><span class="lp-step-arrow">↗</span></div><div class="lp-step-art lp-step-art-done"><span>✓</span><div><strong>Follow-up ready</strong><small>Keep the momentum going</small></div></div><h3>Leave with a plan</h3><p>Turn action items into visible follow-ups and keep them connected to the meeting.</p></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="lp-feature-section lp-section" id="features">
+          <div class="lp-wrap">
+            <div class="lp-section-head lp-reveal"><div><span class="lp-section-index">03 / THE WORKSPACE</span><h2>Everything in its place.</h2></div><p>A calmer home for the details that matter after the call ends.</p></div>
+            <div class="lp-feature-grid">
+              <article class="lp-feature lp-feature-large lp-reveal"><div class="lp-feature-copy"><span>01 / MEETING CALENDAR</span><h3>See what's ahead.<br />Stay ready.</h3><p>A clear view of upcoming meetings, with the time, link, and context close at hand.</p></div><div class="lp-calendar-preview" aria-hidden="true"><div class="lp-preview-head"><span>September 2026</span><span>‹ &nbsp; ›</span></div><div class="lp-preview-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div><div class="lp-preview-grid"><span>14</span><span>15</span><span>16</span><span class="lp-preview-active">17<small>Team sync</small></span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span></div></div></article>
+              <article class="lp-feature lp-feature-summary lp-reveal"><div class="lp-feature-copy"><span>02 / REPORTS</span><h3>The short version,<br />without losing the point.</h3><p>Find the summary, transcript, and decisions in a report you can return to.</p></div><div class="lp-paper-stack" aria-hidden="true"><div class="lp-paper lp-paper-back"></div><div class="lp-paper lp-paper-front"><span>MEETING REPORT</span><strong>Product planning</strong><i></i><i></i><i></i><div><b>Decision</b><small>Move forward with the pilot.</small></div></div></div></article>
+              <article class="lp-feature lp-feature-actions lp-reveal"><div class="lp-feature-copy"><span>03 / ACTION ITEMS</span><h3>Keep the next step<br />in view.</h3><p>Pin the work that matters and make progress visible between meetings.</p></div><div class="lp-task-preview" aria-hidden="true"><div><span class="lp-task-tick">✓</span><s>Review launch brief</s></div><div><span class="lp-task-empty"></span><strong>Share final checklist</strong></div><div><span class="lp-task-empty"></span><strong>Confirm the next review</strong></div></div></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="lp-statement lp-section"><div class="lp-wrap lp-reveal"><span class="lp-section-index">THE SIMPLE IDEA</span><p>Be fully there for the conversation.<br /><em>We'll help you remember what follows.</em></p></div></section>
+
+        <section class="lp-faq lp-section" id="questions"><div class="lp-wrap lp-faq-grid"><div class="lp-reveal"><span class="lp-section-index">04 / GOOD TO KNOW</span><h2>A few things<br />you might ask.</h2></div><div class="lp-faq-list lp-reveal">
+          <details><summary>Can I use a recording from a past meeting?<span>+</span></summary><p>Yes. Upload a supported audio recording and MeetBot can turn it into a report with a transcript and follow-ups.</p></details>
+          <details><summary>Can MeetBot join a live meeting?<span>+</span></summary><p>Yes. You can invite MeetBot to a meeting in progress or schedule it ahead of time.</p></details>
+          <details><summary>Where do I find the next steps?<span>+</span></summary><p>Action items are collected in your workspace. Mark the important ones to keep them on your dashboard.</p></details>
+        </div></div></section>
+
+        <section class="lp-final"><div class="lp-wrap lp-final-inner lp-reveal"><span class="lp-section-index">READY WHEN YOU ARE</span><h2>Less catching up.<br /><em>More moving forward.</em></h2><p>Start a clearer way to meet.</p><a class="lp-button lp-button-light" href="/signup">Get started <span aria-hidden="true">↗</span></a></div></section>
+      </main>
+      <footer class="lp-footer"><div class="lp-wrap lp-footer-inner"><a class="lp-brand" href="/" aria-label="MeetBot home"><span class="lp-brand-mark">M</span><span>meetbot<span class="lp-brand-period">.</span></span></a><p>Stay present. Keep the progress.</p><div><a href="/login">Log in</a><a href="/signup">Get started</a><span>© <span id="lp-year">2026</span> MeetBot</span></div></div></footer>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/landing.js"></script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

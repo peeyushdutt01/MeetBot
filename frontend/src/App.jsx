@@ -43,9 +43,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/thankyou" element={<ThankYou />} />
-            <Route path="/actions" element={<ActionItems />} />
+            <Route path="/actions" element={<ProtectedRoute><ActionItems /></ProtectedRoute>} />
             <Route
-              path="/"
+              path="/app"
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -60,7 +60,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/" element={<Navigate to="/app" replace />} />
+            <Route path="*" element={<Navigate to="/app" replace />} />
           </Routes>
         </ThemeProvider>
       </AuthProvider>

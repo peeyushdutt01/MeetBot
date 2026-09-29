@@ -165,7 +165,7 @@ frontend/
 - **React Router** - Routing
 - **Firebase** - Authentication
 - **Axios** - HTTP client
-- **React Big Calendar** - Calendar component
+- **Custom calendar** - Responsive month grid and meeting list
 - **Moment.js** - Date/time handling
 - **React Icons** - Icon library
 

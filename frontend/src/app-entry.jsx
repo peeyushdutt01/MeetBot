@@ -4,6 +4,8 @@ import App from './App';
 import './styles/index.css';
 import './styles/refresh.css';
 import './styles/polish.css';
+import './styles/calendar-v2.css';
+import './styles/dashboard-v2.css';
 
 document.title = 'MeetBot — Workspace';
 ReactDOM.createRoot(document.getElementById('root')).render(
